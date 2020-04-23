@@ -1,0 +1,113 @@
+---
+title: "multiomic models"
+author: "Ryan Schubert"
+date: "April 20, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(data.table)
+library(dplyr)
+library(tidyr)
+```
+
+##
+
+```{r}
+CAU1<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr1_multiomic_models.txt_chr1_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU2<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr2_multiomic_models.txt_chr2_model_summaries.txt",header=T,stringsAsFactors = F)  %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU3<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr3_multiomic_models.txt_chr3_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU4<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr4_multiomic_models.txt_chr4_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU5<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr5_multiomic_models.txt_chr5_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU6<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr6_multiomic_models.txt_chr6_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU7<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr7_multiomic_models.txt_chr7_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU8<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr8_multiomic_models.txt_chr8_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU9<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr9_multiomic_models.txt_chr9_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU10<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr10_multiomic_models.txt_chr10_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU11<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr11_multiomic_models.txt_chr11_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU12<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr12_multiomic_models.txt_chr12_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU13<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr13_multiomic_models.txt_chr13_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU14<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr14_multiomic_models.txt_chr14_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU15<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr15_multiomic_models.txt_chr15_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU16<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr16_multiomic_models.txt_chr16_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU17<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr17_multiomic_models.txt_chr17_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU18<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr18_multiomic_models.txt_chr18_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU19<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr19_multiomic_models.txt_chr19_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU20<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr20_multiomic_models.txt_chr20_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU21<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr21_multiomic_models.txt_chr21_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+CAU22<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr22_multiomic_models.txt_chr22_model_summaries.txt",header=T,stringsAsFactors = F) %>% mutate(alpha=as.numeric(alpha),n_snps_in_window=as.numeric(n_snps_in_window))
+
+str(CAU5)
+CAUWG<-bind_rows(CAU1,
+                 CAU2,
+                 CAU3,
+                 CAU4,
+                 CAU5,
+                 CAU6,
+                 CAU7,
+                 CAU8,
+                 CAU9,
+                 CAU10,
+                 CAU11,
+                 CAU12,
+                 CAU13,
+                 CAU14,
+                 CAU15,
+                 CAU16,
+                 CAU17,
+                 CAU18,
+                 CAU19,
+                 CAU20,
+                 CAU21,
+                 CAU22)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+CAUWG<-CAUWG %>% filter(!is.na(alpha)) %>% mutate(type=ifelse(grepl("_",gene_id),"protein","RNA"))
+
+CAURNA<-CAUWG %>% select(gene_id,n_snps_in_model,test_R2_avg,type) %>% filter(type=="RNA") %>% rename(RNA_R2=test_R2_avg,n_RNA_snps=n_snps_in_model)
+CAUprot<-CAUWG %>% select(gene_id,n_snps_in_model,test_R2_avg,type) %>% filter(type=="protein") %>% rename(protein_R2=test_R2_avg,n_protein_snps=n_snps_in_model) %>% separate(gene_id,into=c("protein","gene"),remove=F)
+#?separate
+CAU_plot<-inner_join(CAURNA,CAUprot,by=c("gene_id"="gene"))
+str(CAU_plot)
+ggplot(data=CAU_plot,aes(x=protein_R2,y=RNA_R2)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw()
+ggplot(data=CAU_plot,aes(x=protein_R2,y=RNA_R2)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw() + geom_text(aes(label=gene_id)) +xlim(c(0.6,0.7)) +ylim(c(0.4,0.5))
+ggplot(data=CAU_plot,aes(x=n_protein_snps,y=n_RNA_snps)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw()
+
+```
+
+ENSG00000204520 chr 6 MICA
+ENSG00000257017 chr 16 HAPTOGLOBIN
+
+```{r}
+
+CAU16<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr16_multiomic_models.txt_chr16_weights.txt")
+CAU6<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr6_multiomic_models.txt_chr6_weights.txt")
+
+
+CAU6_filt<- CAU6 %>% filter(grepl("ENSG00000204520",CAU6$gene_id ))
+CAU16_filt<- CAU16 %>% filter(grepl("ENSG00000257017",CAU16$gene_id ))
+
+CAU6w<-dcast(CAU6_filt,rsid ~ gene_id)
+CAU16w<-dcast(CAU16_filt,rsid ~ gene_id)
+names(CAU6w)
+ggplot(data=CAU6w,aes(x=ENSG00000204520,y=SL005199_ENSG00000204520)) + geom_point() + geom_abline(slope=1,intercept=0) + geom_smooth(method="lm") + theme_bw()
+names(CAU16w)
+ggplot(data=CAU16w,aes(x=ENSG00000257017,y=SL000437_ENSG00000257017)) + geom_point() + geom_abline(slope=1,intercept=0) + geom_smooth(method="lm")
+```
+
+```{r}
+base<-fread("Z:/topmed/proteome/ashley_baseline_no_multi/en_baseline_CAU_WG_model_summaries.txt",header = F,stringsAsFactors = F)
+colnames(base)<-colnames(CAUWG)[-25]
+
+basefilt<-base %>% select(gene_id,n_snps_in_model,test_R2_avg) %>% rename(baseline_R2=test_R2_avg,n_baseline_snps=n_snps_in_model) %>% mutate(gene_id=gsub("\\.[0-9]+","",gene_id))
+
+base_plot<-inner_join(basefilt,CAUprot,by=c("gene_id"))
+
+ggplot(data=base_plot,aes(x=protein_R2,y=baseline_R2)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw()
+ggplot(data=base_plot,aes(x=n_protein_snps,y=n_baseline_snps)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw()
+```

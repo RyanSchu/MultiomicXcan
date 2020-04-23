@@ -1,0 +1,39 @@
+---
+title: "multivariate - intersect samples"
+author: "Ryan Schubert"
+date: "April 10, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(data.table)
+library(tidyr)
+```
+
+## First lets determine what samples are intersected between the data sets
+
+
+3 Expression tissues to select from: PBMC, MONO, TCELL
+Only one Protein type to choose from (Check on tissue type)
+
+
+```{r cars}
+Proteome_samples<-fread("Z:/topmed/proteome/sample_lists/proteome_basic_pop_codes.txt")
+RNASeq_samples<-fread("Z:/topmed/expression/expression_data_LongID_age.txt")
+matching_samples<-inner_join(Proteome_samples,RNASeq_samples,by="sidno")
+unique_samples<-matching_samples %>% dplyr::select(sidno) %>% unique()
+dim(unique_samples)
+unique_by_tissue_pop<-matching_samples %>% dplyr::select(sidno,pop,tissue) %>% mutate_all(na_if,"") %>% unique()
+table(unique_by_tissue_pop$pop,unique_by_tissue_pop$tissue)
+```
+
+In total there are 396 CAU individuals who have both PBMC and Proteimics data, That is the largest so we will focus on that for now 
+
+
+```{r}
+
+CAU_list<-matching_samples %>% filter(tissue =="PBMC", pop=="CAU")
+fwrite(CAU_list,"Z:/topmed/multiomic_modeling/intersecting_CAU_PBMC_list.txt",sep="\t",col.names=T)
+
+```

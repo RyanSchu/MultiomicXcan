@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l nodes=1:ppn=1
+#PBS -o /home/ryan/logs/${PBS_JOBNAME}.o${PBS_JOBID}.log
+#PBS -e /home/ryan/logs/${PBS_JOBNAME}.e${PBS_JOBID}.err
+#PBS -l walltime=150:00:00
+#PBS -l mem=16gb
+
+/home/ryan/gwasqc_pipeline/shellscripts/01MissingnessFiltering \
+	-b /home/ryan/topmed/plink_files/plink2/CAU/liftover/CAU_hg38_exclude_missnp \
+	-a \
+	-g 0.01 \
+	--maf 0.01 \
+	-o /home/ryan/topmed/plink_files/plink2/QC_CAU/
+/home/ryan/gwasqc_pipeline/shellscripts/02RelatednessFiltering \
+	-b /home/ryan/topmed/plink_files/plink2/QC_CAU/missingness_hwe_steps/05filtered_HWE \
+	-o /home/ryan/topmed/plink_files/plink2/QC_CAU/ \
+	--rel 0.1
+#/home/ryan/gwasqc_pipeline/shellscripts/03MergeHapMap_TOPMED \
+#        -b /home/ryan/topmed/gwas_qc/${pop}/fix_PCA/relatedness_steps/05without_relateds \
+#        -h /home/ryan/HAPMAP3_hg19/topmed_id_format \
+#        -o /home/ryan/topmed/gwas_qc/${pop}/fix_PCA/
+/home/ryan/gwasqc_pipeline/shellscripts/03MergeHapMap_TOPMED \
+        -b /home/ryan/topmed/plink_files/plink2/QC_CAU/relatedness_steps/04LD_pruned \
+        -h /home/ryan/HAPMAP3_hg19/hg38/topmed_id_format \
+        -o /home/ryan/topmed/plink_files/plink2/QC_CAU/
+#/home/ryan/gwasqc_pipeline/shellscripts/03MergeHapMap_TOPMED \
+#        -b /home/ryan/topmed/gwas_qc/${pop}/WG/relatedness_steps/04LD_pruned \
+#        -h /home/ryan/HAPMAP3_hg18/topmed_id_format \
+#        -o /home/ryan/topmed/gwas_qc/${pop}/WG/hg18/
