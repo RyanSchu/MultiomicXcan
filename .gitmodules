@@ -1,0 +1,3 @@
+[submodule "01Genotype_QC/gwasqc_pipeline"]
+	path = 01Genotype_QC/gwasqc_pipeline
+	url = https://github.com/RyanSchu/gwasqc_pipeline.git
