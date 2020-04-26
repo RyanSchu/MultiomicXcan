@@ -9,6 +9,9 @@ output: html_document
 library(data.table)
 library(dplyr)
 library(tidyr)
+library(ggplot2)
+library(visdat)
+library(naniar)
 ```
 
 ##
@@ -78,7 +81,10 @@ ggplot(data=CAU_plot,aes(x=protein_R2,y=RNA_R2)) + geom_point() + geom_abline(sl
 ggplot(data=CAU_plot,aes(x=protein_R2,y=RNA_R2)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw() + geom_text(aes(label=gene_id)) +xlim(c(0.6,0.7)) +ylim(c(0.4,0.5))
 ggplot(data=CAU_plot,aes(x=n_protein_snps,y=n_RNA_snps)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw()
 
+ggplot(data=CAU_plot,aes(x=protein_R2,y=RNA_R2)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw() + geom_text(aes(label=gene_id)) +xlim(c(0.6,0.8)) + ylim(c(-0.1,0.1))
+
 ```
+
 
 ENSG00000204520 chr 6 MICA
 ENSG00000257017 chr 16 HAPTOGLOBIN
@@ -110,4 +116,193 @@ base_plot<-inner_join(basefilt,CAUprot,by=c("gene_id"))
 
 ggplot(data=base_plot,aes(x=protein_R2,y=baseline_R2)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw()
 ggplot(data=base_plot,aes(x=n_protein_snps,y=n_baseline_snps)) + geom_point() + geom_abline(slope=1,intercept=0) + theme_bw()
+```
+
+
+SL005199_ENSG00000204520 chr 6 MICA
+SL000437_ENSG00000257017 chr 16 HAPTOGLOBIN
+
+```{r}
+base_weights<-fread("Z:/topmed/proteome/ashley_baseline_no_multi/en_baseline_CAU_WG_weights.txt")  %>%
+  mutate(V1=gsub("\\.[0-9]+","",V1))  %>%
+  mutate(model="base") 
+
+
+CAU16_filt<-CAU16 %>%
+  filter(grepl("ENSG00000257017",CAU16$gene_id )) %>%
+  mutate(model="multi") %>% 
+  filter(grepl("_",gene_id)) %>%
+  mutate(rsid=paste("chr",rsid,sep=""))
+colnames(base_weights)<-colnames(CAU16_filt)
+
+SL005199<-base_weights %>% 
+  filter(gene_id == "SL000437_ENSG00000257017") %>%
+  rbind.data.frame(CAU16_filt)
+
+CAU16w<-dcast(SL005199,rsid ~ model,value.var="beta")
+
+ggplot(CAU16w,aes(x=base,y=multi)) + geom_miss_point()
+
+# 
+# CAU6_filt<-CAU6_filt %>% mutate(model="multi") %>% filter(grepl("_",gene_id))
+# base_SL005199<-base_weights %>% filter(V1 == "SL005199_ENSG00000204520") %>% rbind.data.frame(CAU_6w) #%>% select(V1,V2,V6)
+
+
+CAU6_filt<-CAU6 %>%
+  filter(grepl("ENSG00000204520",CAU6$gene_id )) %>%
+  mutate(model="multi") %>% 
+  filter(grepl("_",gene_id)) %>%
+  mutate(rsid=paste("chr",rsid,sep=""))
+colnames(base_weights)<-colnames(CAU6_filt)
+
+
+SL000437<-base_weights %>% 
+  filter(gene_id == "SL005199_ENSG00000204520") %>%
+  rbind.data.frame(CAU6_filt)
+
+CAU6w<-dcast(SL000437,rsid ~ model,value.var="beta")
+
+ggplot(CAU6w,aes(x=base,y=multi)) + geom_miss_point()
+```
+
+
+ENSG00000173531 chr 3 MST1
+ENSG00000241186 chr 3 TDGF1
+ENSG00000143727 chr 2 ACP1
+
+```{r}
+
+CAU3<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr3_multiomic_models.txt_chr3_weights.txt")
+CAU2<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr2_multiomic_models.txt_chr2_weights.txt")
+
+CAU3_filt<- CAU3 %>%
+  filter(grepl("ENSG00000173531",CAU3$gene_id )) %>%
+  mutate(model="multi") %>% 
+  filter(grepl("_",gene_id)) %>%
+  mutate(rsid=paste("chr",rsid,sep=""))
+colnames(base_weights)<-colnames(CAU3_filt)
+
+SL005202<-base_weights %>% 
+  filter(gene_id == "SL005202_ENSG00000173531") %>%
+  rbind.data.frame(CAU3_filt)
+
+CAU3w<-dcast(SL005202,rsid ~ model,value.var="beta")
+
+ggplot(CAU3w,aes(x=base,y=multi)) + geom_miss_point()
+#
+CAU3_filt<- CAU3 %>%
+  filter(grepl("ENSG00000241186",CAU3$gene_id )) %>%
+  mutate(model="multi") %>% 
+  filter(grepl("_",gene_id)) %>%
+  mutate(rsid=paste("chr",rsid,sep=""))
+colnames(base_weights)<-colnames(CAU3_filt)
+
+SL005155<-base_weights %>% 
+  filter(gene_id == "SL005155_ENSG00000241186") %>%
+  rbind.data.frame(CAU3_filt)
+
+CAU3w<-dcast(SL005155,rsid ~ model,value.var="beta")
+
+ggplot(CAU3w,aes(x=base,y=multi)) + geom_miss_point()
+#
+CAU2_filt<- CAU2 %>%
+  filter(grepl("ENSG00000143727",CAU2$gene_id )) %>%
+  mutate(model="multi") %>% 
+  filter(grepl("_",gene_id)) %>%
+  mutate(rsid=paste("chr",rsid,sep=""))
+colnames(base_weights)<-colnames(CAU2_filt)
+
+SL008063<-base_weights %>% 
+  filter(gene_id == "SL008063_ENSG00000143727") %>%
+  rbind.data.frame(CAU2_filt)
+
+CAU2w<-dcast(SL008063,rsid ~ model,value.var="beta")
+sum(n_miss_row(CAU2w)==0)
+ggplot(CAU2w,aes(x=base,y=multi)) + geom_miss_point()
+```
+
+
+```{r}
+CAU1<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr1_multiomic_models.txt_chr1_weights.txt")
+CAU2<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr2_multiomic_models.txt_chr2_weights.txt")
+CAU3<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr3_multiomic_models.txt_chr3_weights.txt")
+CAU4<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr4_multiomic_models.txt_chr4_weights.txt")
+CAU5<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr5_multiomic_models.txt_chr5_weights.txt")
+CAU6<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr6_multiomic_models.txt_chr6_weights.txt")
+CAU7<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr7_multiomic_models.txt_chr7_weights.txt")
+CAU8<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr8_multiomic_models.txt_chr8_weights.txt")
+CAU9<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr9_multiomic_models.txt_chr9_weights.txt")
+CAU10<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr10_multiomic_models.txt_chr10_weights.txt")
+CAU11<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr11_multiomic_models.txt_chr11_weights.txt")
+CAU12<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr12_multiomic_models.txt_chr12_weights.txt")
+CAU13<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr13_multiomic_models.txt_chr13_weights.txt")
+CAU14<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr14_multiomic_models.txt_chr14_weights.txt")
+CAU15<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr15_multiomic_models.txt_chr15_weights.txt")
+CAU16<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr16_multiomic_models.txt_chr16_weights.txt")
+CAU17<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr17_multiomic_models.txt_chr17_weights.txt")
+CAU18<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr18_multiomic_models.txt_chr18_weights.txt")
+CAU19<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr19_multiomic_models.txt_chr19_weights.txt")
+CAU20<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr20_multiomic_models.txt_chr20_weights.txt")
+CAU21<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr21_multiomic_models.txt_chr21_weights.txt")
+CAU22<-fread("Z:/topmed/multiomic_modeling/output/CAU_PBMC_chr22_multiomic_models.txt_chr22_weights.txt")
+
+CAUWG<-bind_rows(CAU1,CAU2,CAU3,CAU4,CAU5,CAU6,CAU7,CAU8,CAU9,CAU10,CAU11,CAU12,CAU13,CAU14,CAU15,CAU16,CAU17,CAU18,CAU19,CAU20,CAU21,CAU22)
+CAUWG<-CAUWG %>% 
+  filter(grepl("_",gene_id)) %>%
+  mutate(id=paste(gene_id,":chr",rsid,sep=""),model="multi") 
+
+
+```
+
+
+```{r}
+base_weights<-fread("Z:/topmed/proteome/ashley_baseline_no_multi/en_baseline_CAU_WG_weights.txt") %>%
+  mutate(V1=gsub("\\.[0-9]+","",V1))  %>%
+  mutate(id=paste(V1,":",V2,sep=""),model="base")
+colnames(base_weights)<-colnames(CAUWG)
+
+# base_weights<-base_weights   
+
+WG_weights<-base_weights %>%
+  rbind.data.frame(CAUWG)
+
+CAUw<-dcast(WG_weights,id ~ model,value.var="beta",fun.aggregate=mean)
+
+ggplot(CAUw,aes(x=base,y=multi)) + geom_miss_point()
+sum(n_miss_row(CAUw)==0)
+```
+
+
+```{r}
+base_CAU_weights<-fread("Z:/topmed/proteome/ashley_baseline_no_multi/en_baseline_CAU_WG_weights.txt") %>%
+  mutate(V1=gsub("\\.[0-9]+","",V1))  %>%
+  mutate(id=paste(V1,":",V2,sep=""),model="CAU")
+
+
+base_AFA_weights<-fread("Z:/topmed/proteome/ashley_baseline_no_multi/en_baseline_AFA_WG_weights.txt") %>%
+  mutate(V1=gsub("\\.[0-9]+","",V1))  %>%
+  mutate(id=paste(V1,":",V2,sep=""),model="AFA")
+
+
+compare_weights<-rbind.data.frame(base_CAU_weights,base_AFA_weights)
+
+comparew<-dcast(compare_weights,id ~ model,value.var="V6",fun.aggregate=mean)
+# comparew[comparew == 0]<-NA
+ggplot(comparew,aes(x=AFA,y=CAU)) + geom_miss_point()
+# sum(n_miss_row(comparew)==0)
+```
+
+
+```{r}
+CAUWG<-bind_rows(CAU1,CAU2,CAU3,CAU4,CAU5,CAU6,CAU7,CAU8,CAU9,CAU10,CAU11,CAU12,CAU13,CAU14,CAU15,CAU16,CAU17,CAU18,CAU19,CAU20,CAU21,CAU22)
+CAUWG<-CAUWG %>%
+  mutate(id=paste(gene_id,":chr",rsid,sep=""),model=ifelse(grepl("_",id),"protein","RNA")) %>%
+        mutate(id=gsub("SL[0-9]+_","",id))
+
+comparew<-dcast(CAUWG,id ~ model,value.var="beta",fun.aggregate=mean)
+# comparew[comparew == 0]<-NA
+# comparew<-comparew%>%mutate(id=gsub("SL[0-9]+_","",id))
+ggplot(comparew,aes(x=protein,y=RNA)) + 
+  geom_miss_point() #+ geom_smooth(method="lm")# + geom_contour()
+
 ```
