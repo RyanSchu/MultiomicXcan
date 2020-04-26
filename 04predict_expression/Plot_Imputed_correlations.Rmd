@@ -1,0 +1,1253 @@
+---
+title: "Compare Imputed Protein Spearman Correlation"
+author: "Ryan Schubert"
+date: "March 20, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(viridis)
+library(tidyr)
+library(multcompView)
+```
+
+## Read in spearman correlations
+
+Correlations calculated with `genetic_pi1.R` script
+
+### AFA
+
+```{r,include=F}
+AFAPI0clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/AFA_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CHNPI0clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CHN_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CAUPI0clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CAU_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+HISPI0clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/HIS_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+
+AFAPI0no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/AFA_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CHNPI0no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CHN_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CAUPI0no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CAU_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+HISPI0no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/HIS_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/AFA_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CHNPI0.001clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CHN_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CAUPI0.001clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CAU_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+HISPI0.001clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/HIS_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/AFA_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CHNPI0.001no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CHN_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CAUPI0.001no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CAU_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+HISPI0.001no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/HIS_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/AFA_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CHNPI0.01clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CHN_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CAUPI0.01clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CAU_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+HISPI0.01clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/HIS_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/AFA_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CHNPI0.01no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CHN_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+CAUPI0.01no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CAU_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+HISPI0.01no_clusmodelAFAExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/HIS_R2_-1_model_AFA_expression_spearman_correlation.txt",header=T)
+```
+
+
+### CAU
+
+```{r,include=F}
+AFAPI0clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/AFA_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CHNPI0clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CHN_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CAUPI0clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CAU_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+HISPI0clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/HIS_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+
+AFAPI0no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/AFA_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CHNPI0no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CHN_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CAUPI0no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CAU_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+HISPI0no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/HIS_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/AFA_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CHNPI0.001clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CHN_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CAUPI0.001clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CAU_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+HISPI0.001clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/HIS_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/AFA_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CHNPI0.001no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CHN_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CAUPI0.001no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CAU_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+HISPI0.001no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/HIS_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/AFA_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CHNPI0.01clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CHN_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CAUPI0.01clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CAU_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+HISPI0.01clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/HIS_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/AFA_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CHNPI0.01no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CHN_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+CAUPI0.01no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CAU_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+HISPI0.01no_clusmodelCAUExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/HIS_R2_-1_model_CAU_expression_spearman_correlation.txt",header=T)
+```
+
+
+### CHN
+
+```{r,include=F}
+AFAPI0clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/AFA_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CHNPI0clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CHN_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CAUPI0clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CAU_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+HISPI0clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/HIS_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+
+AFAPI0no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/AFA_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CHNPI0no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CHN_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CAUPI0no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CAU_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+HISPI0no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/HIS_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/AFA_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CHNPI0.001clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CHN_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CAUPI0.001clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CAU_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+HISPI0.001clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/HIS_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/AFA_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CHNPI0.001no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CHN_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CAUPI0.001no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CAU_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+HISPI0.001no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/HIS_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/AFA_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CHNPI0.01clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CHN_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CAUPI0.01clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CAU_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+HISPI0.01clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/HIS_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/AFA_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CHNPI0.01no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CHN_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+CAUPI0.01no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CAU_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+HISPI0.01no_clusmodelCHNExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/HIS_R2_-1_model_CHN_expression_spearman_correlation.txt",header=T)
+```
+
+### HIS
+
+```{r,include=F}
+AFAPI0clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/AFA_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CHNPI0clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CHN_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CAUPI0clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/CAU_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+HISPI0clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_clus/HIS_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+
+AFAPI0no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/AFA_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CHNPI0no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CHN_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CAUPI0no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/CAU_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+HISPI0no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0_no_clus/HIS_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/AFA_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CHNPI0.001clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CHN_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CAUPI0.001clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/CAU_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+HISPI0.001clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_clus/HIS_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.001no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/AFA_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CHNPI0.001no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CHN_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CAUPI0.001no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/CAU_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+HISPI0.001no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.001_no_clus/HIS_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/AFA_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CHNPI0.01clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CHN_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CAUPI0.01clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/CAU_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+HISPI0.01clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_clus/HIS_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+
+AFAPI0.01no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/AFA_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CHNPI0.01no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CHN_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+CAUPI0.01no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/CAU_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+HISPI0.01no_clusmodelHISExp<-fread("Z:/topmed/proteome/dapg_net/imputed_results/PIP_0.01_no_clus/HIS_R2_-1_model_HIS_expression_spearman_correlation.txt",header=T)
+```
+
+
+
+## Concat all models for
+
+### AFA
+
+```{r,include=F }
+AFAPI0clusmodelAFAExp<-AFAPI0clusmodelAFAExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="clus_filtered",ID="AFAPIP0clusfilt")
+CAUPI0clusmodelAFAExp<-CAUPI0clusmodelAFAExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="clus_filtered",ID="CAUPIP0clusfilt")
+CHNPI0clusmodelAFAExp<-CHNPI0clusmodelAFAExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="clus_filtered",ID="CHNPIP0clusfilt")
+HISPI0clusmodelAFAExp<-HISPI0clusmodelAFAExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="clus_filtered",ID="HISPIP0clusfilt")
+
+AFAPI0.001clusmodelAFAExp<-AFAPI0.001clusmodelAFAExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="clus_filtered",ID="AFAPIP0.001clusfilt")
+CAUPI0.001clusmodelAFAExp<-CAUPI0.001clusmodelAFAExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="clus_filtered",ID="CAUPIP0.001clusfilt")
+CHNPI0.001clusmodelAFAExp<-CHNPI0.001clusmodelAFAExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="clus_filtered",ID="CHNPIP0.001clusfilt")
+HISPI0.001clusmodelAFAExp<-HISPI0.001clusmodelAFAExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="clus_filtered",ID="HISPIP0.001clusfilt")
+
+AFAPI0.01clusmodelAFAExp<-AFAPI0.01clusmodelAFAExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="clus_filtered",ID="AFAPIP0.01clusfilt")
+CAUPI0.01clusmodelAFAExp<-CAUPI0.01clusmodelAFAExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="clus_filtered",ID="CAUPIP0.01clusfilt")
+CHNPI0.01clusmodelAFAExp<-CHNPI0.01clusmodelAFAExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="clus_filtered",ID="CHNPIP0.01clusfilt")
+HISPI0.01clusmodelAFAExp<-HISPI0.01clusmodelAFAExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="clus_filtered",ID="HISPIP0.01clusfilt")
+
+AFAPI0no_clusmodelAFAExp<-AFAPI0no_clusmodelAFAExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="no_clus_filtered",ID="AFAPIP0no_clusfilt")
+CAUPI0no_clusmodelAFAExp<-CAUPI0no_clusmodelAFAExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="no_clus_filtered",ID="CAUPIP0no_clusfilt")
+CHNPI0no_clusmodelAFAExp<-CHNPI0no_clusmodelAFAExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="no_clus_filtered",ID="CHNPIP0no_clusfilt")
+HISPI0no_clusmodelAFAExp<-HISPI0no_clusmodelAFAExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="no_clus_filtered",ID="HISPIP0no_clusfilt")
+
+AFAPI0.001no_clusmodelAFAExp<-AFAPI0.001no_clusmodelAFAExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="no_clus_filtered",ID="AFAPIP0.001no_clusfilt")
+CAUPI0.001no_clusmodelAFAExp<-CAUPI0.001no_clusmodelAFAExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="no_clus_filtered",ID="CAUPIP0.001no_clusfilt")
+CHNPI0.001no_clusmodelAFAExp<-CHNPI0.001no_clusmodelAFAExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="no_clus_filtered",ID="CHNPIP0.001no_clusfilt")
+HISPI0.001no_clusmodelAFAExp<-HISPI0.001no_clusmodelAFAExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="no_clus_filtered",ID="HISPIP0.001no_clusfilt")
+
+AFAPI0.01no_clusmodelAFAExp<-AFAPI0.01no_clusmodelAFAExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="no_clus_filtered",ID="AFAPIP0.01no_clusfilt")
+CAUPI0.01no_clusmodelAFAExp<-CAUPI0.01no_clusmodelAFAExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="no_clus_filtered",ID="CAUPIP0.01no_clusfilt")
+CHNPI0.01no_clusmodelAFAExp<-CHNPI0.01no_clusmodelAFAExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="no_clus_filtered",ID="CHNPIP0.01no_clusfilt")
+HISPI0.01no_clusmodelAFAExp<-HISPI0.01no_clusmodelAFAExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="no_clus_filtered",ID="HISPIP0.01no_clusfilt")
+
+AFA_Exp_Correlations<-bind_rows(
+          CAUPI0clusmodelAFAExp,
+          CHNPI0clusmodelAFAExp,
+          HISPI0clusmodelAFAExp,
+          CAUPI0.001clusmodelAFAExp,
+          CHNPI0.001clusmodelAFAExp,
+          HISPI0.001clusmodelAFAExp,
+          CAUPI0.01clusmodelAFAExp,
+          CHNPI0.01clusmodelAFAExp,
+          HISPI0.01clusmodelAFAExp,
+          CAUPI0no_clusmodelAFAExp,
+          CHNPI0no_clusmodelAFAExp,
+          HISPI0no_clusmodelAFAExp,
+          CAUPI0.001no_clusmodelAFAExp,
+          CHNPI0.001no_clusmodelAFAExp,
+          HISPI0.001no_clusmodelAFAExp,
+          CAUPI0.01no_clusmodelAFAExp,
+          CHNPI0.01no_clusmodelAFAExp,
+          HISPI0.01no_clusmodelAFAExp)
+
+```
+
+
+
+### CAU
+
+```{r,include=F }
+AFAPI0clusmodelCAUExp<-AFAPI0clusmodelCAUExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="clus_filtered",ID="AFAPIP0clusfilt")
+CAUPI0clusmodelCAUExp<-CAUPI0clusmodelCAUExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="clus_filtered",ID="CAUPIP0clusfilt")
+CHNPI0clusmodelCAUExp<-CHNPI0clusmodelCAUExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="clus_filtered",ID="CHNPIP0clusfilt")
+HISPI0clusmodelCAUExp<-HISPI0clusmodelCAUExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="clus_filtered",ID="HISPIP0clusfilt")
+
+AFAPI0.001clusmodelCAUExp<-AFAPI0.001clusmodelCAUExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="clus_filtered",ID="AFAPIP0.001clusfilt")
+CAUPI0.001clusmodelCAUExp<-CAUPI0.001clusmodelCAUExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="clus_filtered",ID="CAUPIP0.001clusfilt")
+CHNPI0.001clusmodelCAUExp<-CHNPI0.001clusmodelCAUExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="clus_filtered",ID="CHNPIP0.001clusfilt")
+HISPI0.001clusmodelCAUExp<-HISPI0.001clusmodelCAUExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="clus_filtered",ID="HISPIP0.001clusfilt")
+
+AFAPI0.01clusmodelCAUExp<-AFAPI0.01clusmodelCAUExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="clus_filtered",ID="AFAPIP0.01clusfilt")
+CAUPI0.01clusmodelCAUExp<-CAUPI0.01clusmodelCAUExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="clus_filtered",ID="CAUPIP0.01clusfilt")
+CHNPI0.01clusmodelCAUExp<-CHNPI0.01clusmodelCAUExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="clus_filtered",ID="CHNPIP0.01clusfilt")
+HISPI0.01clusmodelCAUExp<-HISPI0.01clusmodelCAUExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="clus_filtered",ID="HISPIP0.01clusfilt")
+
+AFAPI0no_clusmodelCAUExp<-AFAPI0no_clusmodelCAUExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="no_clus_filtered",ID="AFAPIP0no_clusfilt")
+CAUPI0no_clusmodelCAUExp<-CAUPI0no_clusmodelCAUExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="no_clus_filtered",ID="CAUPIP0no_clusfilt")
+CHNPI0no_clusmodelCAUExp<-CHNPI0no_clusmodelCAUExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="no_clus_filtered",ID="CHNPIP0no_clusfilt")
+HISPI0no_clusmodelCAUExp<-HISPI0no_clusmodelCAUExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="no_clus_filtered",ID="HISPIP0no_clusfilt")
+
+AFAPI0.001no_clusmodelCAUExp<-AFAPI0.001no_clusmodelCAUExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="no_clus_filtered",ID="AFAPIP0.001no_clusfilt")
+CAUPI0.001no_clusmodelCAUExp<-CAUPI0.001no_clusmodelCAUExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="no_clus_filtered",ID="CAUPIP0.001no_clusfilt")
+CHNPI0.001no_clusmodelCAUExp<-CHNPI0.001no_clusmodelCAUExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="no_clus_filtered",ID="CHNPIP0.001no_clusfilt")
+HISPI0.001no_clusmodelCAUExp<-HISPI0.001no_clusmodelCAUExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="no_clus_filtered",ID="HISPIP0.001no_clusfilt")
+
+AFAPI0.01no_clusmodelCAUExp<-AFAPI0.01no_clusmodelCAUExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="no_clus_filtered",ID="AFAPIP0.01no_clusfilt")
+CAUPI0.01no_clusmodelCAUExp<-CAUPI0.01no_clusmodelCAUExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="no_clus_filtered",ID="CAUPIP0.01no_clusfilt")
+CHNPI0.01no_clusmodelCAUExp<-CHNPI0.01no_clusmodelCAUExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="no_clus_filtered",ID="CHNPIP0.01no_clusfilt")
+HISPI0.01no_clusmodelCAUExp<-HISPI0.01no_clusmodelCAUExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="no_clus_filtered",ID="HISPIP0.01no_clusfilt")
+
+CAU_Exp_Correlations<-bind_rows(
+          AFAPI0clusmodelCAUExp,
+          CHNPI0clusmodelCAUExp,
+          HISPI0clusmodelCAUExp,
+          AFAPI0.001clusmodelCAUExp,
+          CHNPI0.001clusmodelCAUExp,
+          HISPI0.001clusmodelCAUExp,
+          AFAPI0.01clusmodelCAUExp,
+          CHNPI0.01clusmodelCAUExp,
+          HISPI0.01clusmodelCAUExp,
+          AFAPI0no_clusmodelCAUExp,
+          CHNPI0no_clusmodelCAUExp,
+          HISPI0no_clusmodelCAUExp,
+          AFAPI0.001no_clusmodelCAUExp,
+          CHNPI0.001no_clusmodelCAUExp,
+          HISPI0.001no_clusmodelCAUExp,
+          AFAPI0.01no_clusmodelCAUExp,
+          CHNPI0.01no_clusmodelCAUExp,
+          HISPI0.01no_clusmodelCAUExp)
+
+```
+
+
+### CHN
+
+```{r,include=F }
+AFAPI0clusmodelCHNExp<-AFAPI0clusmodelCHNExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="clus_filtered",ID="AFAPIP0clusfilt")
+CAUPI0clusmodelCHNExp<-CAUPI0clusmodelCHNExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="clus_filtered",ID="CAUPIP0clusfilt")
+CHNPI0clusmodelCHNExp<-CHNPI0clusmodelCHNExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="clus_filtered",ID="CHNPIP0clusfilt")
+HISPI0clusmodelCHNExp<-HISPI0clusmodelCHNExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="clus_filtered",ID="HISPIP0clusfilt")
+
+AFAPI0.001clusmodelCHNExp<-AFAPI0.001clusmodelCHNExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="clus_filtered",ID="AFAPIP0.001clusfilt")
+CAUPI0.001clusmodelCHNExp<-CAUPI0.001clusmodelCHNExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="clus_filtered",ID="CAUPIP0.001clusfilt")
+CHNPI0.001clusmodelCHNExp<-CHNPI0.001clusmodelCHNExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="clus_filtered",ID="CHNPIP0.001clusfilt")
+HISPI0.001clusmodelCHNExp<-HISPI0.001clusmodelCHNExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="clus_filtered",ID="HISPIP0.001clusfilt")
+
+AFAPI0.01clusmodelCHNExp<-AFAPI0.01clusmodelCHNExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="clus_filtered",ID="AFAPIP0.01clusfilt")
+CAUPI0.01clusmodelCHNExp<-CAUPI0.01clusmodelCHNExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="clus_filtered",ID="CAUPIP0.01clusfilt")
+CHNPI0.01clusmodelCHNExp<-CHNPI0.01clusmodelCHNExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="clus_filtered",ID="CHNPIP0.01clusfilt")
+HISPI0.01clusmodelCHNExp<-HISPI0.01clusmodelCHNExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="clus_filtered",ID="HISPIP0.01clusfilt")
+
+AFAPI0no_clusmodelCHNExp<-AFAPI0no_clusmodelCHNExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="no_clus_filtered",ID="AFAPIP0no_clusfilt")
+CAUPI0no_clusmodelCHNExp<-CAUPI0no_clusmodelCHNExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="no_clus_filtered",ID="CAUPIP0no_clusfilt")
+CHNPI0no_clusmodelCHNExp<-CHNPI0no_clusmodelCHNExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="no_clus_filtered",ID="CHNPIP0no_clusfilt")
+HISPI0no_clusmodelCHNExp<-HISPI0no_clusmodelCHNExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="no_clus_filtered",ID="HISPIP0no_clusfilt")
+
+AFAPI0.001no_clusmodelCHNExp<-AFAPI0.001no_clusmodelCHNExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="no_clus_filtered",ID="AFAPIP0.001no_clusfilt")
+CAUPI0.001no_clusmodelCHNExp<-CAUPI0.001no_clusmodelCHNExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="no_clus_filtered",ID="CAUPIP0.001no_clusfilt")
+CHNPI0.001no_clusmodelCHNExp<-CHNPI0.001no_clusmodelCHNExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="no_clus_filtered",ID="CHNPIP0.001no_clusfilt")
+HISPI0.001no_clusmodelCHNExp<-HISPI0.001no_clusmodelCHNExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="no_clus_filtered",ID="HISPIP0.001no_clusfilt")
+
+AFAPI0.01no_clusmodelCHNExp<-AFAPI0.01no_clusmodelCHNExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="no_clus_filtered",ID="AFAPIP0.01no_clusfilt")
+CAUPI0.01no_clusmodelCHNExp<-CAUPI0.01no_clusmodelCHNExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="no_clus_filtered",ID="CAUPIP0.01no_clusfilt")
+CHNPI0.01no_clusmodelCHNExp<-CHNPI0.01no_clusmodelCHNExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="no_clus_filtered",ID="CHNPIP0.01no_clusfilt")
+HISPI0.01no_clusmodelCHNExp<-HISPI0.01no_clusmodelCHNExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="no_clus_filtered",ID="HISPIP0.01no_clusfilt")
+
+CHN_Exp_Correlations<-bind_rows(
+          CAUPI0clusmodelCHNExp,
+          AFAPI0clusmodelCHNExp,
+          HISPI0clusmodelCHNExp,
+          CAUPI0.001clusmodelCHNExp,
+          AFAPI0.001clusmodelCHNExp,
+          HISPI0.001clusmodelCHNExp,
+          CAUPI0.01clusmodelCHNExp,
+          AFAPI0.01clusmodelCHNExp,
+          HISPI0.01clusmodelCHNExp,
+          CAUPI0no_clusmodelCHNExp,
+          AFAPI0no_clusmodelCHNExp,
+          HISPI0no_clusmodelCHNExp,
+          CAUPI0.001no_clusmodelCHNExp,
+          AFAPI0.001no_clusmodelCHNExp,
+          HISPI0.001no_clusmodelCHNExp,
+          CAUPI0.01no_clusmodelCHNExp,
+          AFAPI0.01no_clusmodelCHNExp,
+          HISPI0.01no_clusmodelCHNExp)
+
+```
+
+
+### HIS
+
+```{r,include=F }
+AFAPI0clusmodelHISExp<-AFAPI0clusmodelHISExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="clus_filtered",ID="AFAPIP0clusfilt")
+CAUPI0clusmodelHISExp<-CAUPI0clusmodelHISExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="clus_filtered",ID="CAUPIP0clusfilt")
+CHNPI0clusmodelHISExp<-CHNPI0clusmodelHISExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="clus_filtered",ID="CHNPIP0clusfilt")
+HISPI0clusmodelHISExp<-HISPI0clusmodelHISExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="clus_filtered",ID="HISPIP0clusfilt")
+
+AFAPI0.001clusmodelHISExp<-AFAPI0.001clusmodelHISExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="clus_filtered",ID="AFAPIP0.001clusfilt")
+CAUPI0.001clusmodelHISExp<-CAUPI0.001clusmodelHISExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="clus_filtered",ID="CAUPIP0.001clusfilt")
+CHNPI0.001clusmodelHISExp<-CHNPI0.001clusmodelHISExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="clus_filtered",ID="CHNPIP0.001clusfilt")
+HISPI0.001clusmodelHISExp<-HISPI0.001clusmodelHISExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="clus_filtered",ID="HISPIP0.001clusfilt")
+
+AFAPI0.01clusmodelHISExp<-AFAPI0.01clusmodelHISExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="clus_filtered",ID="AFAPIP0.01clusfilt")
+CAUPI0.01clusmodelHISExp<-CAUPI0.01clusmodelHISExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="clus_filtered",ID="CAUPIP0.01clusfilt")
+CHNPI0.01clusmodelHISExp<-CHNPI0.01clusmodelHISExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="clus_filtered",ID="CHNPIP0.01clusfilt")
+HISPI0.01clusmodelHISExp<-HISPI0.01clusmodelHISExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="clus_filtered",ID="HISPIP0.01clusfilt")
+
+AFAPI0no_clusmodelHISExp<-AFAPI0no_clusmodelHISExp %>% mutate(model_pop="AFA",PIP=0,clus_filtered="no_clus_filtered",ID="AFAPIP0no_clusfilt")
+CAUPI0no_clusmodelHISExp<-CAUPI0no_clusmodelHISExp %>% mutate(model_pop="CAU",PIP=0,clus_filtered="no_clus_filtered",ID="CAUPIP0no_clusfilt")
+CHNPI0no_clusmodelHISExp<-CHNPI0no_clusmodelHISExp %>% mutate(model_pop="CHN",PIP=0,clus_filtered="no_clus_filtered",ID="CHNPIP0no_clusfilt")
+HISPI0no_clusmodelHISExp<-HISPI0no_clusmodelHISExp %>% mutate(model_pop="HIS",PIP=0,clus_filtered="no_clus_filtered",ID="HISPIP0no_clusfilt")
+
+AFAPI0.001no_clusmodelHISExp<-AFAPI0.001no_clusmodelHISExp %>% mutate(model_pop="AFA",PIP=0.001,clus_filtered="no_clus_filtered",ID="AFAPIP0.001no_clusfilt")
+CAUPI0.001no_clusmodelHISExp<-CAUPI0.001no_clusmodelHISExp %>% mutate(model_pop="CAU",PIP=0.001,clus_filtered="no_clus_filtered",ID="CAUPIP0.001no_clusfilt")
+CHNPI0.001no_clusmodelHISExp<-CHNPI0.001no_clusmodelHISExp %>% mutate(model_pop="CHN",PIP=0.001,clus_filtered="no_clus_filtered",ID="CHNPIP0.001no_clusfilt")
+HISPI0.001no_clusmodelHISExp<-HISPI0.001no_clusmodelHISExp %>% mutate(model_pop="HIS",PIP=0.001,clus_filtered="no_clus_filtered",ID="HISPIP0.001no_clusfilt")
+
+AFAPI0.01no_clusmodelHISExp<-AFAPI0.01no_clusmodelHISExp %>% mutate(model_pop="AFA",PIP=0.01,clus_filtered="no_clus_filtered",ID="AFAPIP0.01no_clusfilt")
+CAUPI0.01no_clusmodelHISExp<-CAUPI0.01no_clusmodelHISExp %>% mutate(model_pop="CAU",PIP=0.01,clus_filtered="no_clus_filtered",ID="CAUPIP0.01no_clusfilt")
+CHNPI0.01no_clusmodelHISExp<-CHNPI0.01no_clusmodelHISExp %>% mutate(model_pop="CHN",PIP=0.01,clus_filtered="no_clus_filtered",ID="CHNPIP0.01no_clusfilt")
+HISPI0.01no_clusmodelHISExp<-HISPI0.01no_clusmodelHISExp %>% mutate(model_pop="HIS",PIP=0.01,clus_filtered="no_clus_filtered",ID="HISPIP0.01no_clusfilt")
+
+HIS_Exp_Correlations<-bind_rows(
+          CAUPI0clusmodelHISExp,
+          CHNPI0clusmodelHISExp,
+          AFAPI0clusmodelHISExp,
+          CAUPI0.001clusmodelHISExp,
+          CHNPI0.001clusmodelHISExp,
+          AFAPI0.001clusmodelHISExp,
+          CAUPI0.01clusmodelHISExp,
+          CHNPI0.01clusmodelHISExp,
+          AFAPI0.01clusmodelHISExp,
+          CAUPI0no_clusmodelHISExp,
+          CHNPI0no_clusmodelHISExp,
+          AFAPI0no_clusmodelHISExp,
+          CAUPI0.001no_clusmodelHISExp,
+          CHNPI0.001no_clusmodelHISExp,
+          AFAPI0.001no_clusmodelHISExp,
+          CAUPI0.01no_clusmodelHISExp,
+          CHNPI0.01no_clusmodelHISExp,
+          AFAPI0.01no_clusmodelHISExp)
+
+```
+
+
+
+## Plot the distributions of concat models
+
+### AFA
+
+```{r}
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=AFA_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in AFA Expression")
+
+g <- ggplot(data=AFA_Exp_Correlations[AFA_Exp_Correlations$model_pop == "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) + 
+  theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of CAU in AFA Expression")
+
+g <- ggplot(data=AFA_Exp_Correlations[AFA_Exp_Correlations$model_pop == "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of CHN in AFA Expression")
+
+g <- ggplot(data=AFA_Exp_Correlations[AFA_Exp_Correlations$model_pop == "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of HIS in AFA Expression")
+
+g <- ggplot(data=AFA_Exp_Correlations[AFA_Exp_Correlations$PIP == 0 & AFA_Exp_Correlations$model_pop != "AFA" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0 in AFA Expression")
+
+g <- ggplot(data=AFA_Exp_Correlations[AFA_Exp_Correlations$PIP == 0.001 & AFA_Exp_Correlations$model_pop != "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in AFA Expression")
+
+g <- ggplot(data=AFA_Exp_Correlations[AFA_Exp_Correlations$PIP == 0.01 & AFA_Exp_Correlations$model_pop != "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in AFA Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+tapply(AFA_Exp_Correlations$estimate,AFA_Exp_Correlations$ID,mean)
+
+```
+
+
+### CAU
+
+```{r}
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=AFA_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in AFA Expression")
+
+g <- ggplot(data=CAU_Exp_Correlations[CAU_Exp_Correlations$model_pop == "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of AFA in CAU Expression")
+
+g <- ggplot(data=CAU_Exp_Correlations[CAU_Exp_Correlations$model_pop == "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of CHN in CAU Expression")
+
+g <- ggplot(data=CAU_Exp_Correlations[CAU_Exp_Correlations$model_pop == "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of HIS in CAU Expression")
+
+g <- ggplot(data=CAU_Exp_Correlations[CAU_Exp_Correlations$PIP == 0 & CAU_Exp_Correlations$model_pop != "CAU" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0 in CAU Expression")
+
+g <- ggplot(data=CAU_Exp_Correlations[CAU_Exp_Correlations$PIP == 0.001 & CAU_Exp_Correlations$model_pop != "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in CAU Expression")
+
+g <- ggplot(data=CAU_Exp_Correlations[CAU_Exp_Correlations$PIP == 0.01 & CAU_Exp_Correlations$model_pop != "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in CAU Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+tapply(CAU_Exp_Correlations$estimate,CAU_Exp_Correlations$ID,mean)
+
+```
+
+
+### CHN
+
+```{r}
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=AFA_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in AFA Expression")
+
+g <- ggplot(data=CHN_Exp_Correlations[CHN_Exp_Correlations$model_pop == "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of AFA in CHN Expression")
+
+g <- ggplot(data=CHN_Exp_Correlations[CHN_Exp_Correlations$model_pop == "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of CAU in CHN Expression")
+
+g <- ggplot(data=CHN_Exp_Correlations[CHN_Exp_Correlations$model_pop == "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of HIS in CHN Expression")
+
+g <- ggplot(data=CHN_Exp_Correlations[CHN_Exp_Correlations$PIP == 0 & CHN_Exp_Correlations$model_pop != "CHN" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0 in CHN Expression")
+
+g <- ggplot(data=CHN_Exp_Correlations[CHN_Exp_Correlations$PIP == 0.001 & CHN_Exp_Correlations$model_pop != "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in CHN Expression")
+
+g <- ggplot(data=CHN_Exp_Correlations[CHN_Exp_Correlations$PIP == 0.01 & CHN_Exp_Correlations$model_pop != "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in CHN Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+tapply(CHN_Exp_Correlations$estimate,CHN_Exp_Correlations$ID,mean)
+
+```
+
+
+
+### HIS
+
+```{r}
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=AFA_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in AFA Expression")
+
+g <- ggplot(data=HIS_Exp_Correlations[HIS_Exp_Correlations$model_pop == "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of AFA in HIS Expression")
+
+g <- ggplot(data=HIS_Exp_Correlations[HIS_Exp_Correlations$model_pop == "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of CAU in HIS Expression")
+
+g <- ggplot(data=HIS_Exp_Correlations[HIS_Exp_Correlations$model_pop == "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of CHN in HIS Expression")
+
+g <- ggplot(data=HIS_Exp_Correlations[HIS_Exp_Correlations$PIP == 0 & HIS_Exp_Correlations$model_pop != "HIS" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0 in HIS Expression")
+
+g <- ggplot(data=HIS_Exp_Correlations[HIS_Exp_Correlations$PIP == 0.001 & HIS_Exp_Correlations$model_pop != "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in HIS Expression")
+
+g <- ggplot(data=HIS_Exp_Correlations[HIS_Exp_Correlations$PIP == 0.01 & HIS_Exp_Correlations$model_pop != "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in HIS Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+tapply(HIS_Exp_Correlations$estimate,HIS_Exp_Correlations$ID,mean)
+
+```
+
+
+
+## ANOVA
+
+### AFA
+
+```{r}
+
+AFA_Exp_Correlations$PIP<-as.factor(AFA_Exp_Correlations$PIP)
+AFA_Exp_Correlations$model_pop<-as.factor(AFA_Exp_Correlations$model_pop)
+AFA_Exp_Correlations$clus_filtered<-as.factor(AFA_Exp_Correlations$clus_filtered)
+
+AFA_Correlations_LM<-lm(estimate ~ model_pop*clus_filtered*PIP,data=AFA_Exp_Correlations)
+aov<-aov(AFA_Correlations_LM)
+summary(aov)
+TukeyHSD(aov)
+
+```
+
+###CAU
+
+```{r}
+
+CAU_Exp_Correlations$PIP<-as.factor(CAU_Exp_Correlations$PIP)
+CAU_Exp_Correlations$model_pop<-as.factor(CAU_Exp_Correlations$model_pop)
+CAU_Exp_Correlations$clus_filtered<-as.factor(CAU_Exp_Correlations$clus_filtered)
+
+CAU_Correlations_LM<-lm(estimate ~ model_pop*clus_filtered*PIP,data=CAU_Exp_Correlations)
+aov<-aov(CAU_Correlations_LM)
+summary(aov)
+TukeyHSD(aov)
+
+```
+
+###CHN
+
+```{r}
+
+CHN_Exp_Correlations$PIP<-as.factor(CHN_Exp_Correlations$PIP)
+CHN_Exp_Correlations$model_pop<-as.factor(CHN_Exp_Correlations$model_pop)
+CHN_Exp_Correlations$clus_filtered<-as.factor(CHN_Exp_Correlations$clus_filtered)
+
+CHN_Correlations_LM<-lm(estimate ~ model_pop*clus_filtered*PIP,data=CHN_Exp_Correlations)
+aov<-aov(CHN_Correlations_LM)
+summary(aov)
+TukeyHSD(aov)
+
+```
+
+###HIS
+
+```{r}
+
+HIS_Exp_Correlations$PIP<-as.factor(HIS_Exp_Correlations$PIP)
+HIS_Exp_Correlations$model_pop<-as.factor(HIS_Exp_Correlations$model_pop)
+HIS_Exp_Correlations$clus_filtered<-as.factor(HIS_Exp_Correlations$clus_filtered)
+
+HIS_Correlations_LM<-lm(estimate ~ model_pop*clus_filtered*PIP,data=HIS_Exp_Correlations)
+aov<-aov(HIS_Correlations_LM)
+summary(aov)
+TukeyHSD(aov)
+
+```
+
+## Do all that again but with intersecting genes only
+
+### AFA
+
+```{r}
+freq<-table(AFA_Exp_Correlations$gene_id)
+
+intersected_AFA_Correlations <- AFA_Exp_Correlations[AFA_Exp_Correlations$gene_id %in% names(freq[freq == 18]), ]
+tapply(intersected_AFA_Correlations$estimate,intersected_AFA_Correlations$ID,mean)
+
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=AFA_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in AFA Expression")
+
+freq<-table(AFA_Exp_Correlations[AFA_Exp_Correlations$model_pop == "CAU",'gene_id'])
+intersected_AFA_Correlations <- AFA_Exp_Correlations[AFA_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+dim(freq)
+g <- ggplot(data=intersected_AFA_Correlations[intersected_AFA_Correlations$model_pop == "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of CAU in AFA Expression")
+
+freq<-table(AFA_Exp_Correlations[AFA_Exp_Correlations$model_pop == "CHN",'gene_id'])
+intersected_AFA_Correlations <- AFA_Exp_Correlations[AFA_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_AFA_Correlations[intersected_AFA_Correlations$model_pop == "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of CHN in AFA Expression")
+
+freq<-table(AFA_Exp_Correlations[AFA_Exp_Correlations$model_pop == "HIS",'gene_id'])
+intersected_AFA_Correlations <- AFA_Exp_Correlations[AFA_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_AFA_Correlations[intersected_AFA_Correlations$model_pop == "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of HIS in AFA Expression")
+
+freq<-table(AFA_Exp_Correlations[AFA_Exp_Correlations$PIP == 0,'gene_id'])
+intersected_AFA_Correlations <- AFA_Exp_Correlations[AFA_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_AFA_Correlations[intersected_AFA_Correlations$PIP == 0 & intersected_AFA_Correlations$model_pop != "AFA" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0 in AFA Expression")
+
+freq<-table(AFA_Exp_Correlations[AFA_Exp_Correlations$PIP == 0.001,'gene_id'])
+intersected_AFA_Correlations <- AFA_Exp_Correlations[AFA_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_AFA_Correlations[intersected_AFA_Correlations$PIP == 0.001 & intersected_AFA_Correlations$model_pop != "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in AFA Expression")
+
+freq<-table(AFA_Exp_Correlations[AFA_Exp_Correlations$PIP == 0.01,'gene_id'])
+intersected_AFA_Correlations <- AFA_Exp_Correlations[AFA_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_AFA_Correlations[intersected_AFA_Correlations$PIP == 0.01 & intersected_AFA_Correlations$model_pop != "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in AFA Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+
+```
+
+### CAU
+
+```{r}
+freq<-table(CAU_Exp_Correlations$gene_id)
+
+intersected_CAU_Correlations <- CAU_Exp_Correlations[CAU_Exp_Correlations$gene_id %in% names(freq[freq == 18]), ]
+tapply(intersected_CAU_Correlations$estimate,intersected_CAU_Correlations$ID,mean)
+
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=CAU_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in CAU Expression")
+
+freq<-table(CAU_Exp_Correlations[CAU_Exp_Correlations$model_pop == "AFA",'gene_id'])
+intersected_CAU_Correlations <- CAU_Exp_Correlations[CAU_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+dim(freq)
+g <- ggplot(data=intersected_CAU_Correlations[intersected_CAU_Correlations$model_pop == "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of AFA in CAU Expression")
+
+freq<-table(CAU_Exp_Correlations[CAU_Exp_Correlations$model_pop == "CHN",'gene_id'])
+intersected_CAU_Correlations <- CAU_Exp_Correlations[CAU_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CAU_Correlations[intersected_CAU_Correlations$model_pop == "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of CHN in CAU Expression")
+
+freq<-table(CAU_Exp_Correlations[CAU_Exp_Correlations$model_pop == "HIS",'gene_id'])
+intersected_CAU_Correlations <- CAU_Exp_Correlations[CAU_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CAU_Correlations[intersected_CAU_Correlations$model_pop == "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of HIS in CAU Expression")
+
+freq<-table(CAU_Exp_Correlations[CAU_Exp_Correlations$PIP == 0,'gene_id'])
+intersected_CAU_Correlations <- CAU_Exp_Correlations[CAU_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CAU_Correlations[intersected_CAU_Correlations$PIP == 0 & intersected_CAU_Correlations$model_pop != "CAU" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0 in CAU Expression")
+
+freq<-table(CAU_Exp_Correlations[CAU_Exp_Correlations$PIP == 0.001,'gene_id'])
+intersected_CAU_Correlations <- CAU_Exp_Correlations[CAU_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CAU_Correlations[intersected_CAU_Correlations$PIP == 0.001 & intersected_CAU_Correlations$model_pop != "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in CAU Expression")
+
+freq<-table(CAU_Exp_Correlations[CAU_Exp_Correlations$PIP == 0.01,'gene_id'])
+intersected_CAU_Correlations <- CAU_Exp_Correlations[CAU_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CAU_Correlations[intersected_CAU_Correlations$PIP == 0.01 & intersected_CAU_Correlations$model_pop != "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in CAU Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+
+```
+
+### CHN
+
+```{r}
+freq<-table(CHN_Exp_Correlations$gene_id)
+
+intersected_CHN_Correlations <- CHN_Exp_Correlations[CHN_Exp_Correlations$gene_id %in% names(freq[freq == 18]), ]
+tapply(intersected_CHN_Correlations$estimate,intersected_CHN_Correlations$ID,mean)
+
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=CHN_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in CHN Expression")
+
+freq<-table(CHN_Exp_Correlations[CHN_Exp_Correlations$model_pop == "AFA",'gene_id'])
+intersected_CHN_Correlations <- CHN_Exp_Correlations[CHN_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+dim(freq)
+g <- ggplot(data=intersected_CHN_Correlations[intersected_CHN_Correlations$model_pop == "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of AFA in CHN Expression")
+
+freq<-table(CHN_Exp_Correlations[CHN_Exp_Correlations$model_pop == "CAU",'gene_id'])
+intersected_CHN_Correlations <- CHN_Exp_Correlations[CHN_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CHN_Correlations[intersected_CHN_Correlations$model_pop == "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of CAU in CHN Expression")
+
+freq<-table(CHN_Exp_Correlations[CHN_Exp_Correlations$model_pop == "HIS",'gene_id'])
+intersected_CHN_Correlations <- CHN_Exp_Correlations[CHN_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CHN_Correlations[intersected_CHN_Correlations$model_pop == "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of HIS in CHN Expression")
+
+freq<-table(CHN_Exp_Correlations[CHN_Exp_Correlations$PIP == 0,'gene_id'])
+intersected_CHN_Correlations <- CHN_Exp_Correlations[CHN_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CHN_Correlations[intersected_CHN_Correlations$PIP == 0 & intersected_CHN_Correlations$model_pop != "CHN" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0 in CHN Expression")
+
+freq<-table(CHN_Exp_Correlations[CHN_Exp_Correlations$PIP == 0.001,'gene_id'])
+intersected_CHN_Correlations <- CHN_Exp_Correlations[CHN_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CHN_Correlations[intersected_CHN_Correlations$PIP == 0.001 & intersected_CHN_Correlations$model_pop != "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in CHN Expression")
+
+freq<-table(CHN_Exp_Correlations[CHN_Exp_Correlations$PIP == 0.01,'gene_id'])
+intersected_CHN_Correlations <- CHN_Exp_Correlations[CHN_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_CHN_Correlations[intersected_CHN_Correlations$PIP == 0.01 & intersected_CHN_Correlations$model_pop != "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in CHN Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+
+```
+
+###HIS
+
+```{r}
+freq<-table(HIS_Exp_Correlations$gene_id)
+
+intersected_HIS_Correlations <- HIS_Exp_Correlations[HIS_Exp_Correlations$gene_id %in% names(freq[freq == 18]), ]
+tapply(intersected_HIS_Correlations$estimate,intersected_HIS_Correlations$ID,mean)
+
+StatN <- ggproto("StatN", Stat,
+    required_aes = c("x", "y"), 
+    compute_group = function(data, scales) {
+    y <- data$y
+    y <- y[!is.na(y)]
+    n <- length(y)
+    data.frame(x = data$x[1], y = min(y), label = paste0("n=", n))
+    }
+)
+
+stat_n <- function(mapping = NULL, data = NULL, geom = "text", 
+    position = "identity", inherit.aes = TRUE, show.legend = NA, 
+        na.rm = FALSE, ...) {
+    ggplot2::layer(stat = StatN, mapping = mapping, data = data, geom = geom, 
+        position = position, inherit.aes = inherit.aes, show.legend = show.legend, 
+        params = list(na.rm = na.rm, ...))
+}
+
+# Comparing distributions of all
+# g <- ggplot(data=HIS_Exp_Correlations)
+# g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+#   geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+#   theme_bw() +
+#   facet_wrap(~model_pop) +
+#   stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+#   ggtitle("Distribution of predictive performance in HIS Expression")
+
+freq<-table(HIS_Exp_Correlations[HIS_Exp_Correlations$model_pop == "AFA",'gene_id'])
+intersected_HIS_Correlations <- HIS_Exp_Correlations[HIS_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+dim(freq)
+g <- ggplot(data=intersected_HIS_Correlations[intersected_HIS_Correlations$model_pop == "AFA",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of AFA in HIS Expression")
+
+freq<-table(HIS_Exp_Correlations[HIS_Exp_Correlations$model_pop == "CHN",'gene_id'])
+intersected_HIS_Correlations <- HIS_Exp_Correlations[HIS_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_HIS_Correlations[intersected_HIS_Correlations$model_pop == "CHN",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of CHN in HIS Expression")
+
+freq<-table(HIS_Exp_Correlations[HIS_Exp_Correlations$model_pop == "CAU",'gene_id'])
+intersected_HIS_Correlations <- HIS_Exp_Correlations[HIS_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_HIS_Correlations[intersected_HIS_Correlations$model_pop == "CAU",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  facet_wrap(~model_pop) +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of CAU in HIS Expression")
+
+freq<-table(HIS_Exp_Correlations[HIS_Exp_Correlations$PIP == 0,'gene_id'])
+intersected_HIS_Correlations <- HIS_Exp_Correlations[HIS_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_HIS_Correlations[intersected_HIS_Correlations$PIP == 0 & intersected_HIS_Correlations$model_pop != "HIS" ,])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0 in HIS Expression")
+
+freq<-table(HIS_Exp_Correlations[HIS_Exp_Correlations$PIP == 0.001,'gene_id'])
+intersected_HIS_Correlations <- HIS_Exp_Correlations[HIS_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_HIS_Correlations[intersected_HIS_Correlations$PIP == 0.001 & intersected_HIS_Correlations$model_pop != "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.001 in HIS Expression")
+
+freq<-table(HIS_Exp_Correlations[HIS_Exp_Correlations$PIP == 0.01,'gene_id'])
+intersected_HIS_Correlations <- HIS_Exp_Correlations[HIS_Exp_Correlations$gene_id %in% names(freq[freq == 6]), ]
+
+g <- ggplot(data=intersected_HIS_Correlations[intersected_HIS_Correlations$PIP == 0.01 & intersected_HIS_Correlations$model_pop != "HIS",])
+g + geom_violin(aes(y=estimate,x=ID,fill=ID)) + 
+  geom_boxplot(aes(y=estimate,x=ID,colour=ID,width=.1)) + 
+  theme_bw() +
+  stat_n(aes(y=estimate,x=ID)) + theme(axis.text.x = element_text( angle = 60, hjust = 1)) +
+  labs(caption = paste("Out of", dim(freq), "protein models")) +
+  ggtitle("Distribution of predictive performance of PIP 0.01 in HIS Expression")
+# g2 <- ggplot(data=AFA_all_models[complete.cases(AFA_all_models) & AFA_all_models$rho_avg > 0.01 & AFA_all_models$zscore_pval < 0.05,])
+# g2 + geom_violin(aes(y=rho_avg,x=level,fill=level)) + 
+#   geom_boxplot(aes(y=rho_avg,x=level,colour=level,width=.01)) + 
+#   theme_bw() +
+#   stat_n(aes(y=rho_avg,x=level)) +
+#   ggtitle("Distribution of significant AFA gene models in all filtering types")
+
+
+```
+

@@ -1,0 +1,280 @@
+---
+title: "compare predictions by  model"
+author: "Ryan Schubert"
+date: "April 25, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(data.table)
+library(dplyr)
+library(ggplot2) 
+library(reshape2)
+library(visdat)
+library(naniar)
+library(MASS)
+library(tibble)
+"%&%" = function(a,b) paste(a,b,sep="")
+
+cordir<-"Z:/topmed/multiomic_modeling/imputed_results/correlations/"
+
+```
+
+## R Markdown
+
+```{r}
+AFA_base<-fread(cordir %&% "AFA_spearman_correlation_with_baseline_model.txt",header=T,stringsAsFactors = F) %>% mutate(model="base")
+AFA_multi<-fread(cordir %&% "AFA_spearman_correlation_with_multiomic_model.txt",header=T,stringsAsFactors = F) %>% mutate(model="multi")
+HIS_base<-fread(cordir %&% "HIS_spearman_correlation_with_baseline_model.txt",header=T,stringsAsFactors = F)%>% mutate(model="base")
+HIS_multi<-fread(cordir %&% "HIS_spearman_correlation_with_multiomic_model.txt",header=T,stringsAsFactors = F) %>% mutate(model="multi")
+CHN_base<-fread(cordir %&% "CHN_spearman_correlation_with_baseline_model.txt",header=T,stringsAsFactors = F) %>% mutate(model="base")
+CHN_multi<-fread(cordir %&% "CHN_spearman_correlation_with_multiomic_model.txt",header=T,stringsAsFactors = F)%>% mutate(model="multi")
+```
+
+## Including Plots
+
+
+```{r}
+
+AFA<-bind_rows(AFA_base,AFA_multi)
+ggplot(data=AFA,aes(x=model,y=estimate)) +
+  geom_violin(aes(fill=model)) +
+  geom_boxplot(aes(colour=model,width=0.1)) +
+  theme_bw() +
+  ggtitle("Imputed AFA Protein Expression")
+
+HIS<-bind_rows(HIS_base,HIS_multi)
+ggplot(data=HIS,aes(x=model,y=estimate)) +
+  geom_violin(aes(fill=model,width=1)) +
+  geom_boxplot(aes(colour=model,width=0.1))+
+  theme_bw() +
+  ggtitle("Imputed HIS Protein Expression")
+
+CHN<-bind_rows(CHN_base,CHN_multi)
+ggplot(data=CHN,aes(x=model,y=estimate)) +
+  geom_violin(aes(fill=model,width=1)) +
+  geom_boxplot(aes(colour=model,width=0.1))+
+  theme_bw() +
+  ggtitle("Imputed CHN Protein Expression")
+
+AFA<-AFA %>% mutate(pop="AFA")
+HIS<-HIS %>% mutate(pop="HIS")
+CHN<-CHN %>% mutate(pop="CHN")
+ALL<-bind_rows(AFA,HIS,CHN)
+ggplot(data=ALL,aes(x=pop,y=estimate)) +
+  geom_violin(aes(fill=pop,width=1)) +
+  geom_boxplot(aes(colour=pop,width=0.1))+
+  theme_bw() +
+  ggtitle("Imputed Protein Expression")
+
+ggplot(data=ALL,aes(x=model,y=estimate)) +
+  geom_violin(aes(fill=model,width=1)) +
+  geom_boxplot(aes(colour=model,width=0.1))+
+  theme_bw() +
+  ggtitle("Imputed Protein Expression")
+
+ALL_wide<-dcast(gene_id ~ model + pop,data=ALL,value.var="estimate")
+
+ggplot(data=ALL_wide,aes(base_CHN,multi_CHN)) +
+  geom_miss_point() + 
+  ggtitle("Imputed Expression Rho Comparison in CHN") +
+  theme_bw() + geom_abline(slope=1,intercept = 0)
+ggplot(data=ALL_wide,aes(base_HIS,multi_HIS)) +
+  geom_miss_point() + 
+  ggtitle("Imputed Expression Rho Comparison in HIS") +
+  theme_bw()  + geom_abline(slope=1,intercept = 0)
+ggplot(data=ALL_wide,aes(base_AFA,multi_AFA)) +
+  geom_miss_point() + 
+  ggtitle("Imputed Expression Rho Comparison in AFA") +
+  theme_bw() + geom_abline(slope=1,intercept = 0)
+
+ALL_wide2<-ALL %>% mutate(id=paste(gene_id,pop,sep="_")) %>% dcast(id ~ model,data=.,value.var="estimate")
+
+ggplot(data=ALL_wide2,aes(base,multi)) +
+  geom_miss_point() + 
+  ggtitle("Imputed Expression Rho Comparison") +
+  theme_bw() + geom_abline(slope=1,intercept = 0)
+
+```
+
+```{r}
+
+AFA_intersected<-names(table(AFA$gene_id)[table(AFA$gene_id) == 2 ])
+AFA_filtered<-AFA %>% filter(gene_id %in% AFA_intersected)
+ggplot(data=AFA_filtered,aes(x=model,y=estimate)) +
+  geom_violin(aes(fill=model)) +
+  geom_boxplot(aes(colour=model,width=0.1)) +
+  theme_bw() +
+  ggtitle("Imputed AFA Protein Expression")
+
+anova(lm(estimate ~ model,data = AFA_filtered))
+
+HIS_intersected<-names(table(HIS$gene_id)[table(HIS$gene_id) == 2 ])
+HIS_filtered<-HIS %>% filter(gene_id %in% HIS_intersected)
+ggplot(data=HIS_filtered,aes(x=model,y=estimate)) +
+  geom_violin(aes(fill=model)) +
+  geom_boxplot(aes(colour=model,width=0.1)) +
+  theme_bw() +
+  ggtitle("Imputed HIS Protein Expression")
+
+anova(lm(estimate ~ model,data = HIS_filtered))
+
+CHN_intersected<-names(table(CHN$gene_id)[table(CHN$gene_id) == 2 ])
+CHN_filtered<-CHN %>% filter(gene_id %in% CHN_intersected)
+ggplot(data=CHN_filtered,aes(x=model,y=estimate)) +
+  geom_violin(aes(fill=model)) +
+  geom_boxplot(aes(colour=model,width=0.1)) +
+  theme_bw() +
+  ggtitle("Imputed CHN Protein Expression")
+
+anova(lm(estimate ~ model,data = CHN_filtered))
+
+```
+
+
+```{r}
+
+predicteddir<-"Z:/topmed/multiomic_modeling/imputed_results/"
+pred_AFA_base<-fread(predicteddir %&% "CAU_baseline_model_AFA_geno_predicted_expression.txt",header=T,stringsAsFactors = F) 
+rename<-colnames(pred_AFA_base) %>% gsub("\\.[0-9]+","",.)
+colnames(pred_AFA_base)<-rename
+pred_AFA_base<-pred_AFA_base %>% dplyr::select(one_of(AFA_intersected)) %>% mutate(model="base")
+
+#%>% dplyr::select(one_of(AFA_intersected))
+pred_AFA_multi<-fread(predicteddir %&% "CAU_multiomic_model_AFA_geno_predicted_expression.txt",header=T,stringsAsFactors = F) %>% dplyr::select(one_of(AFA_intersected)) %>% mutate(model="model")
+
+pred_AFA<-bind_rows(pred_AFA_base,pred_AFA_multi)
+```
+
+
+```{r}
+
+ld<-lda(model ~.,pred_AFA)
+##APER 
+confusion<-table(predict(ld,pred_AFA)$class,pred_AFA$model)
+confusion
+1-sum(diag(confusion))/sum(confusion)
+
+#EAER
+holdouts<-rep(NA,nrow(pred_AFA))
+for (i in 1:nrow(pred_AFA)){
+  holdout<-pred_AFA[i,]
+  tmp<-pred_AFA[-i,]
+  model<-lda(model ~ . , tmp)
+  holdouts[i]<-predict(model,holdout)$class
+}
+confusion2<-table(holdouts,pred_AFA$model)
+confusion2
+1-sum(diag(confusion2))/sum(confusion2)
+
+coefficients<-ld$scaling %>% as.data.frame() %>% rownames_to_column("Protein") %>% arrange(desc(LD1)) %>% inner_join(AFA_filtered,by=c("Protein"="gene_id"))
+ggplot(data=coefficients,aes(x=abs(LD1),y=estimate)) + geom_point() + theme_bw()
+
+
+
+```
+
+```{r}
+R2_rate<-c(-1,0,0.01,0.1,0.3,0.5,0.7)
+n<-length(R2_rate)
+error_rates<-rep(NA,n)
+
+for (i in 1:n){
+  tmp<-AFA %>% filter(test_R2_avg >= R2_rate[i])
+  intersect_list<-c(names(table(tmp$gene_id)[table(tmp$gene_id) == 2 ]),"model")
+  print(length(intersect_list))
+  pred_tmp<-pred_AFA %>% dplyr::select(one_of(intersect_list))
+  ld<-lda(model ~.,pred_tmp)
+  coefficients<-ld$scaling %>% as.data.frame() %>% rownames_to_column("Protein") %>% arrange(desc(LD1)) %>% inner_join(AFA_filtered,by=c("Protein"="gene_id"))
+  print(
+    ggplot(data=coefficients,aes(x=abs(LD1),y=estimate)) + geom_point() + theme_bw() + ggtitle(paste("Imputed LDA weight vs imputation rho in AFA at R2", R2_rate[i]))
+    )
+  confusion<-table(predict(ld,pred_AFA)$class,pred_AFA$model)
+  print(confusion)
+  error_rates[i]<-1-sum(diag(confusion))/sum(confusion)
+}
+```
+
+```{r}
+
+predicteddir<-"Z:/topmed/multiomic_modeling/imputed_results/"
+pred_CHN_base<-fread(predicteddir %&% "CAU_baseline_model_CHN_geno_predicted_expression.txt",header=T,stringsAsFactors = F) 
+rename<-colnames(pred_CHN_base) %>% gsub("\\.[0-9]+","",.)
+colnames(pred_CHN_base)<-rename
+pred_CHN_base<-pred_CHN_base %>% dplyr::select(one_of(CHN_intersected)) %>% mutate(model="base")
+
+#%>% dplyr::select(one_of(CHN_intersected))
+pred_CHN_multi<-fread(predicteddir %&% "CAU_multiomic_model_CHN_geno_predicted_expression.txt",header=T,stringsAsFactors = F) %>% dplyr::select(one_of(CHN_intersected)) %>% mutate(model="model")
+
+pred_CHN<-bind_rows(pred_CHN_base,pred_CHN_multi)
+```
+
+
+```{r}
+
+ld<-lda(model ~.,pred_CHN)
+##APER 
+confusion<-table(predict(ld,pred_CHN)$class,pred_CHN$model)
+confusion
+1-sum(diag(confusion))/sum(confusion)
+
+#EAER
+holdouts<-rep(NA,nrow(pred_CHN))
+for (i in 1:nrow(pred_CHN)){
+  holdout<-pred_CHN[i,]
+  tmp<-pred_CHN[-i,]
+  model<-lda(model ~ . , tmp)
+  holdouts[i]<-predict(model,holdout)$class
+}
+confusion2<-table(holdouts,pred_CHN$model)
+confusion2
+1-sum(diag(confusion2))/sum(confusion2)
+
+coefficients<-ld$scaling %>% as.data.frame() %>% rownames_to_column("Protein") %>% arrange(desc(LD1)) %>% inner_join(CHN_filtered,by=c("Protein"="gene_id"))
+ggplot(data=coefficients,aes(x=abs(LD1),y=estimate)) + geom_point() + theme_bw()
+
+
+
+```
+
+```{r}
+
+predicteddir<-"Z:/topmed/multiomic_modeling/imputed_results/"
+pred_HIS_base<-fread(predicteddir %&% "CAU_baseline_model_HIS_geno_predicted_expression.txt",header=T,stringsAsFactors = F) 
+rename<-colnames(pred_HIS_base) %>% gsub("\\.[0-9]+","",.)
+colnames(pred_HIS_base)<-rename
+pred_HIS_base<-pred_HIS_base %>% dplyr::select(one_of(HIS_intersected)) %>% mutate(model="base")
+
+#%>% dplyr::select(one_of(HIS_intersected))
+pred_HIS_multi<-fread(predicteddir %&% "CAU_multiomic_model_HIS_geno_predicted_expression.txt",header=T,stringsAsFactors = F) %>% dplyr::select(one_of(HIS_intersected)) %>% mutate(model="model")
+
+pred_HIS<-bind_rows(pred_HIS_base,pred_HIS_multi)
+```
+
+
+```{r}
+
+ld<-lda(model ~.,pred_HIS)
+##APER 
+confusion<-table(predict(ld,pred_HIS)$class,pred_HIS$model)
+confusion
+1-sum(diag(confusion))/sum(confusion)
+
+#EAER
+holdouts<-rep(NA,nrow(pred_HIS))
+for (i in 1:nrow(pred_HIS)){
+  holdout<-pred_HIS[i,]
+  tmp<-pred_HIS[-i,]
+  model<-lda(model ~ . , tmp)
+  holdouts[i]<-predict(model,holdout)$class
+}
+confusion2<-table(holdouts,pred_HIS$model)
+confusion2
+1-sum(diag(confusion2))/sum(confusion2)
+
+coefficients<-ld$scaling %>% as.data.frame() %>% rownames_to_column("Protein") %>% arrange(desc(LD1)) %>% inner_join(HIS_filtered,by=c("Protein"="gene_id"))
+ggplot(data=coefficients,aes(x=abs(LD1),y=estimate)) + geom_point() + theme_bw()
+
+
+
+```
